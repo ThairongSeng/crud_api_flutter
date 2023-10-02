@@ -633,7 +633,7 @@ class _HomePageState extends State<HomePage> {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const AddRestaurant()));
           },
-          child: const Icon(Icons.add, color: Colors.white),
+          child: const Icon(Icons.add_circle, color: Colors.white,size: 30),
         ));
   }
 }
