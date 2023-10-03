@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 class AddRestaurant extends StatefulWidget {
   const AddRestaurant({Key? key}) : super(key: key);
 
+
   @override
   State<AddRestaurant> createState() => _AddRestaurantState();
 }
@@ -122,15 +123,11 @@ class _AddRestaurantState extends State<AddRestaurant> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Add restaurant',
-          style: TextStyle(color: Colors.pinkAccent),
-        ),
+        title: const Text('Add Restaurant', style: TextStyle(color: Colors.pinkAccent),),
         actions: [
           IconButton(
             onPressed: _captureImage,
@@ -246,8 +243,8 @@ class _AddRestaurantState extends State<AddRestaurant> {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      _uploadImage(context);
-                      _cancelForm();
+                        _uploadImage(context);
+                        _cancelForm();
                     },
                     child: const Text('Upload'),
                   ),

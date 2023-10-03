@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:food_panda_flutter_ui_app/views/pages/update_restaurant_page.dart';
 import 'package:food_panda_flutter_ui_app/views/widgets/image_cart.dart';
 import 'package:food_panda_flutter_ui_app/views/widgets/map_cart.dart';
 import '../../model/restaurant_model.dart';
@@ -356,7 +357,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-            //popular restaurant
+            //Popular restaurant
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.only(top: 20.0),
@@ -369,22 +370,20 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         const Text(
                           "Popular Restaurants",
-                          style: TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(
                           height: 240,
                           child: FutureBuilder(
                             future: futureRestaurant,
-                            builder: (context, snapshot){
-                              if(snapshot.hasData){
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
                                 return ListView.builder(
                                   scrollDirection: Axis.horizontal,
                                   itemCount: snapshot.data!.data!.length,
                                   itemBuilder: (context, index) {
                                     return Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 15, top: 10),
+                                      padding: const EdgeInsets.only(right: 15, top: 10),
                                       child: GestureDetector(
                                         onTap: () {
                                           showDialog(
@@ -428,21 +427,81 @@ class _HomePageState extends State<HomePage> {
                                             },
                                           );
                                         },
+                                        onLongPress: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return AlertDialog(
+                                                title: const Text("Update Restaurant"),
+                                                content: Text("Restaurant ID: ${snapshot.data!.data![index].id}"),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context); // Close the dialog
+
+                                                        int? id = snapshot.data!.data![index].id;
+                                                       String? name = snapshot.data!.data![index].attributes!.name;
+                                                       String? category = snapshot.data!.data![index].attributes!.category;
+                                                       int? discount = snapshot.data!.data![index].attributes!.discount;
+                                                       double? deliveryFee = snapshot.data!.data![index].attributes!.deliveryFee;
+                                                       int? deliveryTime = snapshot.data!.data![index].attributes!.deliveryTime;
+                                                       String? imageUrl = "https://cms.istad.co${snapshot.data!.data![index].attributes!.picture!.data!.attributes!.url}";
+
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>  UpdateRestaurant(
+                                                            id:id,
+                                                            name: name,
+                                                            category: category,
+                                                            discount: discount,
+                                                            deliveryFee: deliveryFee,
+                                                            deliveryTime: deliveryTime,
+                                                            imageUrl: imageUrl
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    child: const Text(
+                                                      'Update',
+                                                      style: TextStyle(
+                                                        color: Colors.green,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 22,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context); // Close the dialog
+                                                    },
+                                                    child: const Text(
+                                                      'Cancel',
+                                                      style: TextStyle(
+                                                        color: Colors.blueAccent,
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 22,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          );
+                                        },
                                         child: CartProduct(
-                                            restaurantData: snapshot.data!.data![index],
+                                          restaurantData: snapshot.data!.data![index],
                                         ),
-                                      )
+                                      ),
                                     );
                                   },
                                 );
-                              }
-                              else if(snapshot.hasError){
+                              } else if (snapshot.hasError) {
                                 return Text("${snapshot.error}");
                               }
                               return const CircularProgressIndicator();
                             },
-
-                          )
+                          ),
                         )
                       ],
                     ),
@@ -450,6 +509,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+
 
             //Cuisines
             SliverToBoxAdapter(
