@@ -362,13 +362,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ),
               const SizedBox(height: 15,),
               SizedBox(
-                height: 200,
+                height: 180,
                 width: double.infinity,
                 child:  Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: RichText(
                     text: const TextSpan(
-                      style: TextStyle(color: Colors.black, fontSize: 33),
+                      style: TextStyle(color: Colors.black, fontSize: 33, height: 1.5,),
                       children: <TextSpan>[
                         TextSpan(text: 'By replacing your order you agree to our ',),
                         TextSpan(text: 'Terms & Conditions.', style: TextStyle(color: Colors.pinkAccent)),

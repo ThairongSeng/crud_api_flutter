@@ -1,285 +1,566 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
-class UpdateRestaurant extends StatefulWidget {
-  const UpdateRestaurant({
-    Key? key,
-    required this.name,
-    required this.category,
-    required this.discount,
-    required this.deliveryFee,
-    required this.deliveryTime,
-    this.id,
-    this.imageUrl,
-  }) : super(key: key);
-
-  final int? id;
-  final String? name;
-  final String? category;
-  final int? discount;
-  final double? deliveryFee;
-  final int? deliveryTime;
-  final String? imageUrl;
-
+import '../../model/update_model.dart';
+class UpdateRestaurantForm extends StatefulWidget {
+  final item;
+  final idpass;
+  final imgid;
+  UpdateRestaurantForm({required this.item, required this.idpass, required this.imgid,super.key});
   @override
-  State<UpdateRestaurant> createState() => _UpdateRestaurantState();
+  _UpdateRestaurantForm createState() => _UpdateRestaurantForm();
 }
 
-class _UpdateRestaurantState extends State<UpdateRestaurant> {
-  XFile? _image;
+class _UpdateRestaurantForm extends State<UpdateRestaurantForm> {
+  final _formKey = GlobalKey<FormState>();
 
-  TextEditingController name = TextEditingController();
-  TextEditingController category = TextEditingController();
-  TextEditingController discount = TextEditingController();
-  TextEditingController deliveryTime = TextEditingController();
-  TextEditingController deliveryFee = TextEditingController();
-
-  Future<void> _selectImage() async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: ImageSource.gallery);
-
-    setState(() {
-      _image = pickedImage;
-    });
-  }
-
-  Future<void> _captureImage() async {
-    final picker = ImagePicker();
-    final capturedImage = await picker.pickImage(source: ImageSource.camera);
-
-    setState(() {
-      _image = capturedImage;
-    });
-  }
-
-  Future<void> _uploadImage(BuildContext context) async {
-    if (_image == null) {
-      return;
-    }
-
-    final url = Uri.parse('https://cms.istad.co/api/food-panda-restaurants/${widget.id}'); // Update the URL to include the restaurant ID
-
-    try {
-      final request = http.MultipartRequest('PUT', url); // Use the PUT method for updating the restaurant
-      request.fields['image_url'] = _image!.path; // Pass the image URL as a field
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-
-      if (response.statusCode == 200) {
-        final imageId = jsonDecode(response.body)['image_id']; // Extract the image ID from the response
-        await updateRestaurant(imageId); // Pass the image ID to the updateRestaurant method
-        _showAlertDialog(context, 'Update Successfully');
-        _cancelForm();
-      } else {
-        print(response.reasonPhrase);
-      }
-    } catch (e) {
-      print('Error during image update: $e');
-    }
-  }
-
-  void _showAlertDialog(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Alert'),
-          content: Text(message),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('OK'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _cancelForm() {
-    setState(() {
-      name.clear();
-      category.clear();
-      discount.clear();
-      deliveryTime.clear();
-      deliveryFee.clear();
-      _image = null;
-    });
-  }
-
-  Future<void> updateRestaurant(String imageId) async {
-    final url = Uri.parse('https://cms.istad.co/api/food-panda-restaurants');
-
-    final response = await http.put(
-      url,
-      body: jsonEncode({
-        'data': {
-          'name': name.text,
-          'category': category.text,
-          'discount': int.parse(discount.text),
-          'deliveryTime': int.parse(deliveryTime.text),
-          'deliveryFee': double.parse(deliveryFee.text),
-          'picture': imageId,
-        },
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      print('Restaurant update successfully');
-    } else {
-      print('Failed to update restaurant. Status code: ${response.statusCode}');
-    }
-  }
-
+  TextEditingController nameController = TextEditingController();
+  TextEditingController categoryController = TextEditingController();
+  TextEditingController discountController = TextEditingController();
+  TextEditingController deliveryFeeController = TextEditingController();
+  TextEditingController deliveryTimeController = TextEditingController();
   @override
   void initState() {
     super.initState();
-    name.text = widget.name ?? '';
-    category.text = widget.category ?? '';
-    discount.text = widget.discount?.toString() ?? '';
-    deliveryTime.text = widget.deliveryTime?.toString() ?? '';
-    deliveryFee.text = widget.deliveryFee?.toString() ?? '';
-    _image = widget.imageUrl != null ? XFile(widget.imageUrl!) : null;
+    nameController.text = widget.item?.name;
+    categoryController.text=widget.item?.category;
+    discountController.text=widget.item!.discount.toString();
+    deliveryFeeController.text=widget.item!.deliveryFee.toString();
+    deliveryTimeController.text=widget.item!.deliveryTime.toString();
+  }
+
+  File? images;
+
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedImage = await ImagePicker().pickImage(source: source);
+    setState(() {
+      if (pickedImage != null) {
+        images = File(pickedImage.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
+  Future<int> uploadImage (path) async{
+    var request = http.MultipartRequest('POST', Uri.parse('https://cms.istad.co/api/upload'));
+    // Add the image file to the request
+    if (images != null) {
+      request.files.add(await http.MultipartFile.fromPath('files', path));
+    }
+    // Send the request and handle the response
+    var response = await request.send();
+    if (response.statusCode == 200) {
+      print('API request successful');
+      var responseBody = await response.stream.bytesToString();
+      var parsedResponse = jsonDecode(responseBody);
+      int id = parsedResponse[0]['id'];
+      print('The ID is: $id');
+      print(responseBody);
+      return id;
+    } else {
+      print('API request failed');
+      return widget.item?.picture?.id;
+    }
+  }
+  Future<void> updateDate (jsonData) async{
+    var headers = {
+      'Content-Type': 'application/json'
+    };
+    var requests = http.Request('PUT', Uri.parse('https://cms.istad.co/api/food-panda-restaurants/${widget.idpass}'));
+    requests.body =jsonData;
+    requests.headers.addAll(headers);
+    http.StreamedResponse responses = await requests.send();
+    if (responses.statusCode == 200) {
+      print(await responses.stream.bytesToString());
+    }
+    else {
+      print(responses.reasonPhrase);
+    }
+  }
+
+  void submitForm() async{
+    if (_formKey.currentState!.validate()) {
+      // Retrieve the form field values from the controllers
+      String name = nameController.text;
+      String category = categoryController.text;
+      int discount = int.parse(discountController.text);
+      double deliveryFee = double.parse(deliveryFeeController.text);
+      int deliveryTime = int.parse(deliveryTimeController.text);
+      // You can perform further actions with the form data and the selected image here
+      //posting Image
+      var ids = images != null ? await uploadImage(images!.path) : widget.imgid;
+      print(ids);
+      //positing restaurant
+      RestaurantInsertModel restaurantData = RestaurantInsertModel(
+        data: Data(
+          name: name,
+          category: category,
+          discount: discount,
+          deliveryFee: deliveryFee,
+          deliveryTime: deliveryTime,
+          picture: "$ids",
+        ),
+      );
+      String jsonData = restaurantInsertModelToJson(restaurantData);
+      print(jsonData);
+      //future insertdata
+      updateDate(jsonData);
+      // Reset the form
+      _formKey.currentState!.reset();
+      // Clear the text field controllers
+      nameController.clear();
+      categoryController.clear();
+      discountController.clear();
+      deliveryFeeController.clear();
+      deliveryTimeController.clear();
+      // Clear the image selection
+      setState(() {
+        images = null;
+      });
+      Navigator.of(context).pop();
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Update Successful'),
+            content: Text('Your restaurant has been successfully updated.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+
+
+    }
+  }
+
+  @override
+  void dispose() {
+    // Dispose the text field controllers when the widget is disposed
+    nameController.dispose();
+    categoryController.dispose();
+    discountController.dispose();
+    deliveryFeeController.dispose();
+    deliveryTimeController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Update Restaurant', style: TextStyle(color: Colors.pinkAccent),),
-        actions: [
-          IconButton(
-            onPressed: _captureImage,
-            icon: const Icon(Icons.camera_alt, color: Colors.pinkAccent),
-          ),
-          IconButton(
-            onPressed: _selectImage,
-            icon: const Icon(Icons.photo, color: Colors.pinkAccent),
-          ),
-        ],
+        title: const Text('Update Restaurant'),
+        centerTitle: true,
+          actions: [
+            IconButton(
+              onPressed: () => _pickImage(ImageSource.gallery),
+              icon: const Icon(Icons.photo, color: Colors.pinkAccent),
+            ),
+          ],
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Image.network(
-                widget.imageUrl!,
-                width: 200,
-                height: 200,
-                fit: BoxFit.fitHeight,
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10.0,
-                  horizontal: 20,
+              images != null
+                  ? Image.file(images!, height: 200, width: 200, fit: BoxFit.fitHeight,)
+                  : Image.network('https://cms.istad.co${widget.item?.picture?.data?.attributes?.url}', height: 200, width: 200, fit: BoxFit.fitHeight,),
+
+              const SizedBox(height: 40),
+
+              TextFormField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Name',
+                  hintText: 'Enter Name'
                 ),
-                child: TextField(
-                  controller: name,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Name',
-                    hintText: 'Enter Name',
-                  ),
-                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a name';
+                  }
+                  return null;
+                },
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10.0,
-                  horizontal: 20,
-                ),
-                child: TextField(
-                  controller: category,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: categoryController,
+                decoration: const InputDecoration(
                     labelText: 'Category',
-                    hintText: 'Enter Category',
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10.0,
-                  horizontal: 20,
-                ),
-                child: TextField(
-                  controller: discount,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: 'Discount',
-                    hintText: 'Enter Discount',
-                  ),
+                    hintText: 'Enter Name'
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a category';
+                  }
+                  return null;
+                },
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10.0,
-                  horizontal: 20,
-                ),
-                child: TextField(
-                  controller: deliveryTime,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: discountController,
+                decoration: const InputDecoration(
+                  labelText: 'Discount',
                     border: OutlineInputBorder(),
+                    hintText: 'Enter Discount'
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a discount';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: deliveryFeeController,
+                decoration: const InputDecoration(
+                  labelText: 'Delivery Fee',
+                    border: OutlineInputBorder(),
+                    hintText: 'Enter Delivery Fee'
+                ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a delivery fee';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: deliveryTimeController,
+                decoration: const InputDecoration(
                     labelText: 'Delivery Time',
-                    hintText: 'Enter Delivery Time',
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10.0,
-                  horizontal: 20,
-                ),
-                child: TextField(
-                  controller: deliveryFee,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: 'Delivery Fee',
-                    hintText: 'Enter Delivery Fee',
-                  ),
+                    hintText: 'Enter Delivery Time'
                 ),
+                keyboardType: TextInputType.number,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter a delivery time';
+                  }
+                  return null;
+                },
               ),
-              const SizedBox(
-                height: 20,
-              ),
+
+              const SizedBox(height: 20),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
-                    onPressed: () {
-                      _uploadImage(context);
-                    },
+                    onPressed: submitForm,
                     child: const Text('Update'),
                   ),
                   const SizedBox(width: 20),
                   ElevatedButton(
-                    onPressed: _cancelForm,
+                    onPressed: (){
+                      Navigator.of(context).pop();
+                      },
                     child: const Text('Cancel'),
                   ),
                 ],
               ),
+
             ],
           ),
         ),
       ),
     );
   }
-
 }
-
-
-
+//
+// import 'dart:convert';
+// import 'dart:io';
+// import 'package:flutter/material.dart';
+// import 'package:image_picker/image_picker.dart';
+// import 'package:http/http.dart' as http;
+//
+// import '../../model/update_model.dart';
+//
+// class UpdateRestaurantForm extends StatefulWidget {
+//   final item;
+//   final idpass;
+//   final imgid;
+//
+//   UpdateRestaurantForm({required this.item, required this.idpass, required this.imgid, super.key});
+//
+//   @override
+//   _UpdateRestaurantFormState createState() => _UpdateRestaurantFormState();
+// }
+//
+// class _UpdateRestaurantFormState extends State<UpdateRestaurantForm> {
+//   final _formKey = GlobalKey<FormState>();
+//
+//   TextEditingController nameController = TextEditingController();
+//   TextEditingController categoryController = TextEditingController();
+//   TextEditingController discountController = TextEditingController();
+//   TextEditingController deliveryFeeController = TextEditingController();
+//   TextEditingController deliveryTimeController = TextEditingController();
+//
+//   bool isUpdated = false;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     nameController.text = widget.item?.name;
+//     categoryController.text = widget.item?.category;
+//     discountController.text = widget.item!.discount.toString();
+//     deliveryFeeController.text = widget.item!.deliveryFee.toString();
+//     deliveryTimeController.text = widget.item!.deliveryTime.toString();
+//   }
+//
+//   File? images;
+//
+//   Future<void> _pickImage(ImageSource source) async {
+//     final pickedImage = await ImagePicker().pickImage(source: source);
+//     setState(() {
+//       if (pickedImage != null) {
+//         images = File(pickedImage.path);
+//       } else {
+//         print('No image selected.');
+//       }
+//     });
+//   }
+//
+//   Future<int> uploadImage(path) async {
+//     var request = http.MultipartRequest('POST', Uri.parse('https://cms.istad.co/api/upload'));
+//     // Add the image file to the request
+//     if (images != null) {
+//       request.files.add(await http.MultipartFile.fromPath('files', path));
+//     }
+//     // Send the request and handle the response
+//     var response = await request.send();
+//     if (response.statusCode == 200) {
+//       print('API request successful');
+//       var responseBody = await response.stream.bytesToString();
+//       var parsedResponse = jsonDecode(responseBody);
+//       int id = parsedResponse[0]['id'];
+//       print('The ID is: $id');
+//       print(responseBody);
+//       return id;
+//     } else {
+//       print('API request failed');
+//       return widget.item?.picture?.id;
+//     }
+//   }
+//
+//   Future<void> updateData(jsonData) async {
+//     var headers = {'Content-Type': 'application/json'};
+//     var requests = http.Request('PUT', Uri.parse('https://cms.istad.co/api/food-panda-restaurants/${widget.idpass}'));
+//     requests.body = jsonData;
+//     requests.headers.addAll(headers);
+//     http.StreamedResponse responses = await requests.send();
+//     if (responses.statusCode == 200) {
+//       print(await responses.stream.bytesToString());
+//     } else {
+//       print(responses.reasonPhrase);
+//     }
+//   }
+//
+//   void submitForm() async {
+//     if (_formKey.currentState!.validate()) {
+//       // Retrieve the form field values from the controllers
+//       String name = nameController.text;
+//       String category = categoryController.text;
+//       int discount = int.parse(discountController.text);
+//       double deliveryFee = double.parse(deliveryFeeController.text);
+//       int deliveryTime = int.parse(deliveryTimeController.text);
+//       // You can perform further actions with the form data and the selected image here
+//       //posting Image
+//       var ids = images != null ? await uploadImage(images!.path) : widget.imgid;
+//       print(ids);
+//       //posting restaurant
+//       RestaurantInsertModel restaurantData = RestaurantInsertModel(
+//         data: Data(
+//           name: name,
+//           category: category,
+//           discount: discount,
+//           deliveryFee: deliveryFee,
+//           deliveryTime: deliveryTime,
+//           picture: "$ids",
+//         ),
+//       );
+//       String jsonData = restaurantInsertModelToJson(restaurantData);
+//       print(jsonData);
+//       //future insertdata
+//       await updateData(jsonData);
+//       // Reset the form
+//       _formKey.currentState!.reset();
+//       // Clear the text field controllers
+//       nameController.clear();
+//       categoryController.clear();
+//       discountController.clear();
+//       deliveryFeeController.clear();
+//       deliveryTimeController.clear();
+//       // Clear the image selection
+//       setState(() {
+//         images = null;
+//         isUpdated = true;
+//       });
+//       showDialog(
+//         context: context,
+//         builder: (_) => AlertDialog(
+//           title: Text('Success'),
+//           content: Text('Restaurant updated successfully'),
+//           actions: [
+//             TextButton(
+//               onPressed: () {
+//                 Navigator.of(context).pop();
+//               },
+//               child: Text('OK'),
+//             ),
+//           ],
+//         ),
+//       );
+//     }
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Update Restaurant'),
+//       ),
+//       body: SingleChildScrollView(
+//         child: Padding(
+//           padding: EdgeInsets.all(20),
+//           child: Form(
+//             key: _formKey,
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 TextFormField(
+//                   controller: nameController,
+//                   decoration: InputDecoration(
+//                     labelText: 'Name',
+//                   ),
+//                   validator: (value) {
+//                     if (value == null || value.isEmpty) {
+//                       return 'Please enter a name';
+//                     }
+//                     return null;
+//                   },
+//                 ),
+//                 TextFormField(
+//                   controller: categoryController,
+//                   decoration: InputDecoration(
+//                     labelText: 'Category',
+//                   ),
+//                   validator: (value) {
+//                     if (value == null || value.isEmpty) {
+//                       return 'Please enter a category';
+//                     }
+//                     return null;
+//                   },
+//                 ),
+//                 TextFormField(
+//                   controller: discountController,
+//                   decoration: InputDecoration(
+//                     labelText: 'Discount',
+//                   ),
+//                   keyboardType: TextInputType.number,
+//                   validator: (value) {
+//                     if (value == null || value.isEmpty) {
+//                       return 'Please enter a discount';
+//                     }
+//                     return null;
+//                   },
+//                 ),
+//                 TextFormField(
+//                   controller: deliveryFeeController,
+//                   decoration: InputDecoration(
+//                     labelText: 'Delivery Fee',
+//                   ),
+//                   keyboardType: TextInputType.number,
+//                   validator: (value) {
+//                     if (value == null || value.isEmpty) {
+//                       return 'Please enter a delivery fee';
+//                     }
+//                     return null;
+//                   },
+//                 ),
+//                 TextFormField(
+//                   controller: deliveryTimeController,
+//                   decoration: InputDecoration(
+//                     labelText: 'Delivery Time',
+//                   ),
+//                   keyboardType: TextInputType.number,
+//                   validator: (value) {
+//                     if (value == null || value.isEmpty) {
+//                       return 'Please enter a delivery time';
+//                     }
+//                     return null;
+//                   },
+//                 ),
+//                 SizedBox(height: 20),
+//                 Center(
+//                   child: images != null
+//                       ? Image.file(
+//                     images!,
+//                     height: 200,
+//                   )
+//                       : Text('No image selected'),
+//                 ),
+//                 SizedBox(height: 20),
+//                 Row(
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   children: [
+//                     ElevatedButton(
+//                       onPressed: () {
+//                         _pickImage(ImageSource.camera);
+//                       },
+//                       child: Text('Take Photo'),
+//                     ),
+//                     SizedBox(width: 10),
+//                     ElevatedButton(
+//                       onPressed: () {
+//                         _pickImage(ImageSource.gallery);
+//                       },
+//                       child: Text('Select Photo'),
+//                     ),
+//                   ],
+//                 ),
+//                 SizedBox(height: 20),
+//                 Center(
+//                   child: ElevatedButton(
+//                     onPressed: submitForm,
+//                     child: Text('Update'),
+//                   ),
+//                 ),
+//                 if (isUpdated)
+//                   Center(
+//                     child: ElevatedButton(
+//                       onPressed: () {
+//                         setState(() {
+//                           isUpdated = false;
+//                         });
+//                       },
+//                       child: Text('Refresh'),
+//                     ),
+//                   ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }

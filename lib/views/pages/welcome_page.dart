@@ -13,9 +13,9 @@ class WelcomePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Image.asset("assets/images/welcome.png"),
-            Image.asset("assets/images/splashScreen.png",
-              width: 500,
-              fit: BoxFit.fitWidth,
+            Image.asset("assets/images/becomepro.png",
+              height: 250,
+              fit: BoxFit.fitHeight,
             )
           ],
         ),

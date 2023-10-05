@@ -47,11 +47,11 @@ class CartProduct extends StatelessWidget {
                       ),
                       color: Colors.black,
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5),
+                    child: const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 5),
                       child: Text(
-                        "${restaurantData!.attributes!.discount} \$",
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        "Top Restaurant",
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                     ))),
             Positioned(

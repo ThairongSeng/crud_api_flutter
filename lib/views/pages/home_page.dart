@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:food_panda_flutter_ui_app/model/cuisine_model.dart';
 import 'package:food_panda_flutter_ui_app/views/pages/update_restaurant_page.dart';
 import 'package:food_panda_flutter_ui_app/views/widgets/image_cart.dart';
 import 'package:food_panda_flutter_ui_app/views/widgets/map_cart.dart';
@@ -7,6 +8,7 @@ import '../../model/restaurant_model.dart';
 import '../widgets/advertisement_cart.dart';
 import '../widgets/cart_product.dart';
 import 'add_restaurant_page.dart';
+import 'detail_page.dart';
 import 'drawer_widget.dart';
 import '../widgets/small_cart.dart';
 
@@ -20,16 +22,28 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   late Future<RestaurantModel> futureRestaurant;
+  late Future<CuisineModel> futureCuisine;
 
-  Future<RestaurantModel> fetchRestaurant() async{
-    final response = await http.get(Uri.parse("https://cms.istad.co/api/food-panda-restaurants?populate=*"));
+  Future<RestaurantModel> fetchRestaurant() async {
+    final response = await http.get(Uri.parse(
+        "https://cms.istad.co/api/food-panda-restaurants?populate=*"));
 
-    if(response.statusCode == 200){
+    if (response.statusCode == 200) {
       return restaurantModelFromJson(response.body);
-    }else{
+    } else {
       throw Exception("Failed to load restaurant");
+    }
+  }
+
+  Future<CuisineModel> fetchCuisine() async {
+    final response = await http.get(Uri.parse(
+        "https://cms.istad.co/api/food-panda-cuisines?populate=*"));
+
+    if (response.statusCode == 200) {
+      return cuisineModelFromJson(response.body);
+    } else {
+      throw Exception("Failed to load cuisine");
     }
   }
 
@@ -53,6 +67,7 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
     futureRestaurant = fetchRestaurant();
+    futureCuisine = fetchCuisine();
   }
 
   @override
@@ -168,7 +183,7 @@ class _HomePageState extends State<HomePage> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Image.asset(
-                              "assets/images/food_panda.jpg",
+                              "assets/images/fooddelivery.jpg",
                               height: 100,
                             ),
                           ],
@@ -185,7 +200,7 @@ class _HomePageState extends State<HomePage> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: SizedBox(
-                  height: 320,
+                  height: 300,
                   child: Row(
                     children: [
                       Expanded(
@@ -224,8 +239,8 @@ class _HomePageState extends State<HomePage> {
                                 child: Align(
                                   alignment: Alignment.bottomRight,
                                   child: Image.asset(
-                                    "assets/images/food_panda.jpg",
-                                    height: 100,
+                                    "assets/images/grocery.jpg",
+                                    height: 150,
                                     width: 150,
                                   ),
                                 ),
@@ -280,9 +295,9 @@ class _HomePageState extends State<HomePage> {
                                       child: Align(
                                         alignment: Alignment.bottomRight,
                                         child: Image.asset(
-                                          "assets/images/food_panda.jpg",
-                                          height: 70,
-                                          width: 100,
+                                          "assets/images/pickup.jpg",
+                                          height: 90,
+                                          width: 90,
                                         ),
                                       ),
                                     )
@@ -316,7 +331,7 @@ class _HomePageState extends State<HomePage> {
                                                 Text(
                                                   "pandasend",
                                                   style: TextStyle(
-                                                      fontSize: 20,
+                                                      fontSize: 21,
                                                       fontWeight:
                                                           FontWeight.bold),
                                                 ),
@@ -335,8 +350,8 @@ class _HomePageState extends State<HomePage> {
                                             child: Column(
                                               children: [
                                                 Image.asset(
-                                                  "assets/images/pandasend.png",
-                                                  height: 80,
+                                                  "assets/images/pandasend.jpg",
+                                                  height: 70,
                                                 ),
                                               ],
                                             ),
@@ -370,7 +385,8 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         const Text(
                           "Popular Restaurants",
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 22, fontWeight: FontWeight.bold),
                         ),
                         SizedBox(
                           height: 240,
@@ -383,28 +399,36 @@ class _HomePageState extends State<HomePage> {
                                   itemCount: snapshot.data!.data!.length,
                                   itemBuilder: (context, index) {
                                     return Padding(
-                                      padding: const EdgeInsets.only(right: 15, top: 10),
+                                      padding: const EdgeInsets.only(
+                                          right: 15, top: 10),
                                       child: GestureDetector(
                                         onTap: () {
                                           showDialog(
                                             context: context,
                                             builder: (BuildContext context) {
                                               return AlertDialog(
-                                                title: const Text("Are you sure to delete?"),
+                                                title: const Text(
+                                                    "Are you sure to delete?"),
                                                 actions: [
                                                   TextButton(
                                                     onPressed: () {
-                                                      deleteRestaurant(snapshot.data!.data![index].id!);
+                                                      deleteRestaurant(snapshot
+                                                          .data!
+                                                          .data![index]
+                                                          .id!);
                                                       setState(() {
-                                                        snapshot.data!.data!.removeAt(index);
+                                                        snapshot.data!.data!
+                                                            .removeAt(index);
                                                       });
-                                                      Navigator.pop(context); // Close the dialog
+                                                      Navigator.pop(
+                                                          context); // Close the dialog
                                                     },
                                                     child: const Text(
                                                       'Yes',
                                                       style: TextStyle(
                                                         color: Colors.redAccent,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontSize: 22,
                                                       ),
                                                     ),
@@ -413,13 +437,16 @@ class _HomePageState extends State<HomePage> {
                                                     child: const Text(
                                                       'Cancel',
                                                       style: TextStyle(
-                                                        color: Colors.blueAccent,
-                                                        fontWeight: FontWeight.bold,
+                                                        color:
+                                                            Colors.blueAccent,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontSize: 22,
                                                       ),
                                                     ),
                                                     onPressed: () {
-                                                      Navigator.pop(context); // Close the dialog
+                                                      Navigator.pop(
+                                                          context); // Close the dialog
                                                     },
                                                   ),
                                                 ],
@@ -427,38 +454,33 @@ class _HomePageState extends State<HomePage> {
                                             },
                                           );
                                         },
+                                        onDoubleTap: (){
+                                          Navigator.push(context, MaterialPageRoute(builder: (context) => const ProductDetailsPage()));
+                                        },
                                         onLongPress: () {
                                           showDialog(
                                             context: context,
                                             builder: (BuildContext context) {
                                               return AlertDialog(
-                                                title: const Text("Update Restaurant"),
-                                                content: Text("Restaurant ID: ${snapshot.data!.data![index].id}"),
+                                                title: const Text(
+                                                    "Update Restaurant"),
+                                                content: Text(
+                                                    "Restaurant ID: ${snapshot.data!.data![index].id}"),
                                                 actions: [
                                                   TextButton(
                                                     onPressed: () {
-                                                      Navigator.pop(context); // Close the dialog
-
-                                                        int? id = snapshot.data!.data![index].id;
-                                                       String? name = snapshot.data!.data![index].attributes!.name;
-                                                       String? category = snapshot.data!.data![index].attributes!.category;
-                                                       int? discount = snapshot.data!.data![index].attributes!.discount;
-                                                       double? deliveryFee = snapshot.data!.data![index].attributes!.deliveryFee;
-                                                       int? deliveryTime = snapshot.data!.data![index].attributes!.deliveryTime;
-                                                       String? imageUrl = "https://cms.istad.co${snapshot.data!.data![index].attributes!.picture!.data!.attributes!.url}";
+                                                      Navigator.pop( context); // Close the dialog
+                                                        final item = snapshot.data!.data![index].attributes;
+                                                        final imgid =snapshot.data!.data![index].attributes?.picture?.data?.id;
+                                                        final idpass = snapshot.data!.data![index].id?.toInt();
 
                                                       Navigator.push(
                                                         context,
                                                         MaterialPageRoute(
-                                                          builder: (context) =>  UpdateRestaurant(
-                                                            id:id,
-                                                            name: name,
-                                                            category: category,
-                                                            discount: discount,
-                                                            deliveryFee: deliveryFee,
-                                                            deliveryTime: deliveryTime,
-                                                            imageUrl: imageUrl
-                                                          ),
+                                                          builder: (context) =>
+                                                              UpdateRestaurantForm(
+                                                                  idpass: idpass, item: item, imgid:imgid
+                                                              ),
                                                         ),
                                                       );
                                                     },
@@ -466,20 +488,24 @@ class _HomePageState extends State<HomePage> {
                                                       'Update',
                                                       style: TextStyle(
                                                         color: Colors.green,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontSize: 22,
                                                       ),
                                                     ),
                                                   ),
                                                   TextButton(
                                                     onPressed: () {
-                                                      Navigator.pop(context); // Close the dialog
+                                                      Navigator.pop(
+                                                          context); // Close the dialog
                                                     },
                                                     child: const Text(
                                                       'Cancel',
                                                       style: TextStyle(
-                                                        color: Colors.blueAccent,
-                                                        fontWeight: FontWeight.bold,
+                                                        color:
+                                                            Colors.blueAccent,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                         fontSize: 22,
                                                       ),
                                                     ),
@@ -490,7 +516,8 @@ class _HomePageState extends State<HomePage> {
                                           );
                                         },
                                         child: CartProduct(
-                                          restaurantData: snapshot.data!.data![index],
+                                          restaurantData:
+                                              snapshot.data!.data![index],
                                         ),
                                       ),
                                     );
@@ -510,8 +537,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-
-            //Cuisines
+            //Cuisine
             SliverToBoxAdapter(
               child: Container(
                 color: Colors.white,
@@ -525,27 +551,35 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(
                             fontSize: 22, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(
-                        height: 240,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: 10,
-                          itemBuilder: (context, index) {
-                            return const Padding(
-                              padding: EdgeInsets.only(right: 20, top: 10),
-                              child: Column(
-                                children: [
-                                  SmallCartProduct(),
-                                  SizedBox(
-                                    height: 25,
-                                  ),
-                                  SmallCartProduct()
-                                ],
-                              ),
-                            );
-                          },
-                        ),
+                      const SizedBox(
+                        height: 15,
                       ),
+                      SizedBox(
+                          height: 210,
+                          child: FutureBuilder(
+                            future: futureCuisine,
+                            builder: (context, snapshot){
+                              if (snapshot.hasData) {
+                                return GridView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                  ),
+                                  itemCount: snapshot.data!.data!.length,
+                                  itemBuilder: (context, index) {
+                                    return SmallCartProduct(
+                                      cuisineData: snapshot.data!.data![index],
+
+                                    );
+                                  },
+                                );
+                              } else if (snapshot.hasError) {
+                                return Text("${snapshot.error}");
+                              }
+                              return const CircularProgressIndicator();
+                            },
+                          )),
                     ],
                   ),
                 ),
@@ -634,7 +668,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-            //Shop
+            // Shop
             SliverToBoxAdapter(
               child: Container(
                 color: Colors.white,
@@ -650,18 +684,30 @@ class _HomePageState extends State<HomePage> {
                       ),
                       SizedBox(
                         height: 120,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: 10,
-                          itemBuilder: (context, index) {
-                            return const Padding(
-                              padding: EdgeInsets.only(right: 20, top: 10),
-                              child: Column(
-                                children: [
-                                  SmallCartProduct(),
-                                ],
-                              ),
-                            );
+                        child: FutureBuilder(
+                          future: futureCuisine,
+                          builder: (context, snapshot){
+                            if (snapshot.hasData) {
+                              return ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: snapshot.data!.data!.length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 20, top: 10),
+                                    child: Column(
+                                      children: [
+                                        SmallCartProduct(
+                                          cuisineData: snapshot.data!.data![index],
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              );
+                            } else if (snapshot.hasError) {
+                              return Text("${snapshot.error}");
+                            }
+                            return const CircularProgressIndicator();
                           },
                         ),
                       ),
@@ -671,7 +717,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-            //advertisement cart
+            //become a pro
             SliverList(
                 delegate: SliverChildBuilderDelegate(
               (context, index) {
@@ -686,14 +732,13 @@ class _HomePageState extends State<HomePage> {
             )),
           ],
         ),
-
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.pinkAccent,
           onPressed: () {
             Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const AddRestaurant()));
           },
-          child: const Icon(Icons.add_circle, color: Colors.white,size: 30),
+          child: const Icon(Icons.add_circle, color: Colors.white, size: 30),
         ));
   }
 }

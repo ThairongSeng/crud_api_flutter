@@ -32,7 +32,7 @@ class AdvertiseCart extends StatelessWidget {
               ),
               Column(
                 children: [
-                  Image.asset("assets/images/food_panda.jpg", width: 95, height: 95,),
+                  Image.asset("assets/images/becomepro.png", width: 95, height: 95,),
                 ],
               )
             ],

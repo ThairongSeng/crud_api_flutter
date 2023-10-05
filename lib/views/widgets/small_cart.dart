@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:food_panda_flutter_ui_app/model/cuisine_model.dart';
 
 
 class SmallCartProduct extends StatelessWidget {
-  const SmallCartProduct({
-    super.key,
-  });
+  SmallCartProduct({super.key, required this.cuisineData});
+
+  CuisineData? cuisineData;
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +24,8 @@ class SmallCartProduct extends StatelessWidget {
                     color: Colors.grey[100],
                     borderRadius: BorderRadius.circular(10)),
                 child: ClipRRect(
-                  child: Image.asset(
-                    "assets/images/cafe.png",
+                  child: Image.network(
+                    "https://cms.istad.co${cuisineData!.attributes!.thumbnail!.data!.attributes!.url}",
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -30,10 +33,10 @@ class SmallCartProduct extends StatelessWidget {
             )
           ],
         ),
-        const SizedBox(
+        SizedBox(
           child: Text(
-            "Milk Tea",
-            style: TextStyle(
+            "${cuisineData!.attributes!.title}",
+            style: const TextStyle(
                 fontSize: 15, fontWeight: FontWeight.bold),
           ),
         )
