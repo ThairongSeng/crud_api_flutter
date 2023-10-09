@@ -14,12 +14,16 @@ class AddRestaurant extends StatefulWidget {
 
 class _AddRestaurantState extends State<AddRestaurant> {
   XFile? _image;
+  final _formKey = GlobalKey<FormState>();
+
 
   TextEditingController name = TextEditingController();
   TextEditingController category = TextEditingController();
   TextEditingController discount = TextEditingController();
   TextEditingController deliveryTime = TextEditingController();
   TextEditingController deliveryFee = TextEditingController();
+
+
 
   Future<void> _selectImage() async {
     final picker = ImagePicker();
@@ -142,120 +146,154 @@ class _AddRestaurantState extends State<AddRestaurant> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                child: _image != null
-                    ? Image.file(
-                        File(_image!.path),
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      )
-                    : Container(
-                        width: 200,
-                        height: 200,
-                        color: Colors.pink[100],
-                      ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10.0,
-                  horizontal: 20,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  child: _image != null
+                      ? Image.file(
+                          File(_image!.path),
+                          width: 200,
+                          height: 200,
+                          fit: BoxFit.cover,
+                        )
+                      : Container(
+                          width: 200,
+                          height: 200,
+                          color: Colors.pink[100],
+                        ),
                 ),
-                child: TextField(
-                  controller: name,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Name',
-                    hintText: 'Enter Name',
+                const SizedBox(
+                  height: 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10.0,
+                    horizontal: 20,
                   ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10.0,
-                  horizontal: 20,
-                ),
-                child: TextField(
-                  controller: category,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Category',
-                    hintText: 'Enter Category',
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10.0,
-                  horizontal: 20,
-                ),
-                child: TextField(
-                  controller: discount,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Discount',
-                    hintText: 'Enter Discount',
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10.0,
-                  horizontal: 20,
-                ),
-                child: TextField(
-                  controller: deliveryTime,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Delivery Time',
-                    hintText: 'Enter Delivery Time',
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10.0,
-                  horizontal: 20,
-                ),
-                child: TextField(
-                  controller: deliveryFee,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Delivery Fee',
-                    hintText: 'Enter Delivery Fee',
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                        _uploadImage(context);
-                        _cancelForm();
+                  child: TextFormField(
+                    controller: name,
+                    decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Name',
+                        hintText: 'Enter Name'
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a name';
+                      }
+                      return null;
                     },
-                    child: const Text('Upload'),
                   ),
-                  const SizedBox(width: 20),
-                  ElevatedButton(
-                    onPressed: _cancelForm,
-                    child: const Text('Cancel'),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10.0,
+                    horizontal: 20,
                   ),
-                ],
-              ),
-            ],
+                  child: TextFormField(
+                    controller: category,
+                    decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Category',
+                        hintText: 'Enter Category'
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a category';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10.0,
+                    horizontal: 20,
+                  ),
+                  child: TextFormField(
+                    controller: discount,
+                    decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Discount',
+                        hintText: 'Enter Discount'
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a discount';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10.0,
+                    horizontal: 20,
+                  ),
+                  child: TextFormField(
+                    controller: deliveryTime,
+                    decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Delivery Time',
+                        hintText: 'Enter Delivery Time'
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a delivery time';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10.0,
+                    horizontal: 20,
+                  ),
+                  child: TextFormField(
+                    controller: deliveryFee,
+                    decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Delivery Fee',
+                        hintText: 'Enter Delivery Fee'
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a delivery fee';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () async {
+                         _formKey.currentState!.validate();
+                          _uploadImage(context);
+                          _cancelForm();
+                      },
+                      child: const Text('Upload'),
+                    ),
+                    const SizedBox(width: 20),
+                    ElevatedButton(
+                      onPressed: (){
+                        _cancelForm();
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

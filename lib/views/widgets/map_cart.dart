@@ -1,17 +1,33 @@
 import 'package:flutter/material.dart';
 
+import '../../model/restaurant_model.dart';
+
 class CartMap extends StatelessWidget {
-  const CartMap({
+  CartMap({
     super.key,
+    required this.dataRestaurant
   });
+
+  DataRestaurant? dataRestaurant;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    String? imageUrl;
 
+    if (dataRestaurant != null &&
+        dataRestaurant!.attributes != null &&
+        dataRestaurant!.attributes!.picture != null &&
+        dataRestaurant!.attributes!.picture!.data != null &&
+        dataRestaurant!.attributes!.picture!.data!.attributes != null) {
+      imageUrl = "https://cms.istad.co${dataRestaurant!.attributes!.picture!.data!.attributes!.url.toString()}";
+    } else {
+      imageUrl = "https://cdn.vectorstock.com/i/preview-1x/65/30/default-image-icon-missing-picture-page-vector-40546530.jpg";
+    }
+    return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: Colors.white,
+
       ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -21,12 +37,12 @@ class CartMap extends StatelessWidget {
             Stack(
               children: [
                 SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.65,
-                  height: 150,
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  height: 170,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(16),
-                    child: Image.asset(
-                      "assets/images/starbuck.jpg",
+                    child: Image.network(
+                      imageUrl,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -35,57 +51,66 @@ class CartMap extends StatelessWidget {
                 Positioned(
                     top: 10,
                     child: Container(
-                        width: 120,
                         decoration: const BoxDecoration(
                           borderRadius: BorderRadius.only(
                               topRight: Radius.circular(10),
                               bottomRight: Radius.circular(10)
                           ),
-                          color: Colors.black,
+                          color: Colors.pinkAccent,
                         ),
                         child: const Padding(
                           padding: EdgeInsets.all(5.0),
                           child: Text(
-                            "Top restaurant",
+                            "Save 10% ON PICK-UP!",
                             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                           ),
                         ))),
-                Positioned(
-                    bottom: 10,
-                    left: 10,
-                    child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.white,
-                        ),
-                        child: const Padding(
-                          padding: EdgeInsets.all(5.0),
-                          child: Text(
-                            "16 min",
-                            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                          ),
-                        )))
+                // Positioned(
+                //     top: 50,
+                //     // left: 10,
+                //     child: Container(
+                //         decoration: const BoxDecoration(
+                //           borderRadius: BorderRadius.only(
+                //               topRight: Radius.circular(10),
+                //               bottomRight: Radius.circular(10)
+                //           ),
+                //           color: Colors.black54,
+                //         ),
+                //         child: const Padding(
+                //           padding: EdgeInsets.all(5.0),
+                //           child: Text(
+                //             "Top restaurant",
+                //             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                //           ),
+                //         )))
               ],
             ),
-            const Padding(
-              padding: EdgeInsets.only(top: 10.0, left: 5),
+            Padding(
+              padding: const EdgeInsets.only(top: 10.0, left: 5),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Starbucks FUN Mall TK",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold),
+                  Row(
+                    children: [
+                      Text(
+                        "${dataRestaurant!.attributes!.name}",
+                        style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(width: 80,),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Icon(Icons.star, color: Colors.red,),
+                          Text("4.7 ",style: TextStyle(fontWeight: FontWeight.bold),),
+                          Text("(500+)")
+                        ],
+                      )
+                    ],
                   ),
                   Text(
-                    '\$\$\$ Tea & Coffee, American, Bevera...',
-                  ),
-                  Text(
-                    "\$ 0.27 delivery free",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12),
+                    "1.1km away - Pick up in \$ ${dataRestaurant!.attributes!.deliveryFee} min",
                   )
                 ],
               ),

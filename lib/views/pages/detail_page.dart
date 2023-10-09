@@ -257,6 +257,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
               ),
 
           ),
+
           Expanded(
             child: PageView.builder(
               controller: _pageController,

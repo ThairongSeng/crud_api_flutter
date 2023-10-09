@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:food_panda_flutter_ui_app/views/pages/checkout_page.dart';
+import 'package:food_panda_flutter_ui_app/views/pages/home_page.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:lottie/lottie.dart';
 
@@ -29,7 +29,7 @@ class _SuccessfulPageState extends State<SuccessfulPage> {
         toolbarHeight: 80,
         leading: IconButton(
           onPressed: (){
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const CheckoutPage()));
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomePage()));
           },
           icon: const Icon(Icons.close),
           color: Colors.pinkAccent,
@@ -172,12 +172,12 @@ class _SuccessfulPageState extends State<SuccessfulPage> {
                       const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Your order number:",
+                          Text("Your order from:",
                               style: TextStyle(
                                   fontSize: 17, color: Colors.black54)),
                           Text("Burger King (Tep Phorn)",
                               style: TextStyle(
-                                  fontSize: 17, fontWeight: FontWeight.bold))
+                                  fontSize: 16, fontWeight: FontWeight.bold))
                         ],
                       ),
                       const SizedBox(
@@ -186,12 +186,13 @@ class _SuccessfulPageState extends State<SuccessfulPage> {
                       const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Delivery address",
+
+                          Text("Delivery address:",
                               style: TextStyle(
                                   fontSize: 17, color: Colors.black54)),
                           Text("112 street. 664, Phnom Penh",
                               style: TextStyle(
-                                  fontSize: 17, fontWeight: FontWeight.bold)),
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
                         ],
                       ),
                       const Align(
@@ -199,7 +200,7 @@ class _SuccessfulPageState extends State<SuccessfulPage> {
                           child: Text(
                             "Phnom Penh",
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 17),
+                                fontWeight: FontWeight.bold, fontSize: 16),
                           ))
                     ],
                   ),

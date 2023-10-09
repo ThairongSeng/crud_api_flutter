@@ -22,6 +22,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   late Future<RestaurantModel> futureRestaurant;
   late Future<CuisineModel> futureCuisine;
 
@@ -331,7 +332,7 @@ class _HomePageState extends State<HomePage> {
                                                 Text(
                                                   "pandasend",
                                                   style: TextStyle(
-                                                      fontSize: 21,
+                                                      fontSize: 20,
                                                       fontWeight:
                                                           FontWeight.bold),
                                                 ),
@@ -351,7 +352,7 @@ class _HomePageState extends State<HomePage> {
                                               children: [
                                                 Image.asset(
                                                   "assets/images/pandasend.jpg",
-                                                  height: 70,
+                                                  height: MediaQuery.of(context).size.height * 0.08,
                                                 ),
                                               ],
                                             ),
@@ -526,7 +527,7 @@ class _HomePageState extends State<HomePage> {
                               } else if (snapshot.hasError) {
                                 return Text("${snapshot.error}");
                               }
-                              return const CircularProgressIndicator();
+                              return const Center(child: CircularProgressIndicator());
                             },
                           ),
                         )
@@ -586,39 +587,6 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-            //your daily deals
-            SliverToBoxAdapter(
-              child: Container(
-                color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Your daily deals",
-                        style: TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(
-                        height: 220,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: 10,
-                          itemBuilder: (context, index) {
-                            return const Padding(
-                              padding: EdgeInsets.only(right: 15, top: 10),
-                              child: ImageCart(),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
             //pick up at a restaurant near you
             SliverToBoxAdapter(
               child: Container(
@@ -649,19 +617,76 @@ class _HomePageState extends State<HomePage> {
                           padding: const EdgeInsets.only(top: 30.0),
                           child: SizedBox(
                             height: 260,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: 10,
-                              itemBuilder: (context, index) {
-                                return const Padding(
-                                  padding: EdgeInsets.only(right: 15, top: 10),
-                                  child: CartMap(),
-                                );
+                            child: FutureBuilder(
+                              future: futureRestaurant,
+                              builder: (context, snapshot){
+                                if (snapshot.hasData) {
+                                  return ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: 10,
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(right: 15, top: 10),
+                                        child: CartMap(
+                                            dataRestaurant: snapshot.data!.data![index]
+                                        ),
+                                      );
+                                    },
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return Text("${snapshot.error}");
+                                }
+                                return const CircularProgressIndicator();
                               },
                             ),
                           ),
                         ),
                       ]),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            //your daily deals
+            SliverToBoxAdapter(
+              child: Container(
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Your daily deals",
+                        style: TextStyle(
+                            fontSize: 22, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(
+                        height: 220,
+                        child: FutureBuilder(
+                          future: futureCuisine,
+                          builder: (context, snapshot){
+                            if (snapshot.hasData) {
+                              return ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: snapshot.data!.data!.length,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 15, top: 10),
+                                    child: ImageCart(
+                                      cuisineData: snapshot.data!.data![index],
+                                    ),
+                                  );
+                                },
+                              );
+                            } else if (snapshot.hasError) {
+                              return Text("${snapshot.error}");
+                            }
+                            return const CircularProgressIndicator();
+                          },
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -728,7 +753,7 @@ class _HomePageState extends State<HomePage> {
                       child: AdvertiseCart(),
                     ));
               },
-              childCount: 5,
+              childCount: 1,
             )),
           ],
         ),

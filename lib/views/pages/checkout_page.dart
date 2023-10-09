@@ -77,7 +77,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           Image.asset(
                             'assets/images/map.jpg',
                             height: 100,
-                            width: 330,
+                            width: MediaQuery.of(context).size.width * 0.8,
                             fit: BoxFit.fitWidth,
                           ),
                         ],

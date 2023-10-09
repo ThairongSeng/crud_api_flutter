@@ -1,17 +1,17 @@
 import 'dart:convert';
 
-RestaurantInsertModel restaurantInsertModelFromJson(String str) => RestaurantInsertModel.fromJson(json.decode(str));
+RestaurantUpdateModel restaurantUpdateModelFromJson(String str) => RestaurantUpdateModel.fromJson(json.decode(str));
 
-String restaurantInsertModelToJson(RestaurantInsertModel data) => json.encode(data.toJson());
+String restaurantUpdateModelToJson(RestaurantUpdateModel data) => json.encode(data.toJson());
 
-class RestaurantInsertModel {
+class RestaurantUpdateModel {
   Data? data;
 
-  RestaurantInsertModel({
+  RestaurantUpdateModel({
     this.data,
   });
 
-  factory RestaurantInsertModel.fromJson(Map<String, dynamic> json) => RestaurantInsertModel(
+  factory RestaurantUpdateModel.fromJson(Map<String, dynamic> json) => RestaurantUpdateModel(
     data: json["data"] == null ? null : Data.fromJson(json["data"]),
   );
 

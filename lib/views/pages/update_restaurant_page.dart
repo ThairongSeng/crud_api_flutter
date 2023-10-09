@@ -95,7 +95,7 @@ class _UpdateRestaurantForm extends State<UpdateRestaurantForm> {
       var ids = images != null ? await uploadImage(images!.path) : widget.imgid;
       print(ids);
       //positing restaurant
-      RestaurantInsertModel restaurantData = RestaurantInsertModel(
+      RestaurantUpdateModel restaurantData = RestaurantUpdateModel(
         data: Data(
           name: name,
           category: category,
@@ -105,7 +105,7 @@ class _UpdateRestaurantForm extends State<UpdateRestaurantForm> {
           picture: "$ids",
         ),
       );
-      String jsonData = restaurantInsertModelToJson(restaurantData);
+      String jsonData = restaurantUpdateModelToJson(restaurantData);
       print(jsonData);
       //future insertdata
       updateDate(jsonData);
