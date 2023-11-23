@@ -2,12 +2,6 @@
   "configVersion": 2,
   "packages": [
     {
-      "name": "animated_splash_screen",
-      "rootUri": "file:///C:/Users/USer/AppData/Local/Pub/Cache/hosted/pub.dev/animated_splash_screen-1.3.0",
-      "packageUri": "lib/",
-      "languageVersion": "2.12"
-    },
-    {
       "name": "archive",
       "rootUri": "file:///C:/Users/USer/AppData/Local/Pub/Cache/hosted/pub.dev/archive-3.3.9",
       "packageUri": "lib/",
@@ -236,12 +230,6 @@
       "languageVersion": "2.18"
     },
     {
-      "name": "page_transition",
-      "rootUri": "file:///C:/Users/USer/AppData/Local/Pub/Cache/hosted/pub.dev/page_transition-2.1.0",
-      "packageUri": "lib/",
-      "languageVersion": "2.17"
-    },
-    {
       "name": "path",
       "rootUri": "file:///C:/Users/USer/AppData/Local/Pub/Cache/hosted/pub.dev/path-1.8.3",
       "packageUri": "lib/",
@@ -332,7 +320,7 @@
       "languageVersion": "3.1"
     }
   ],
-  "generated": "2023-10-05T15:02:52.300034Z",
+  "generated": "2023-11-23T08:26:23.524542Z",
   "generator": "pub",
   "generatorVersion": "3.1.0"
 }
